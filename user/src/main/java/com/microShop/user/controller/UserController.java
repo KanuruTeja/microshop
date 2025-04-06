@@ -2,27 +2,53 @@ package com.microShop.user.controller;
 
 import com.microShop.user.entity.User;
 import com.microShop.user.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
+import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/users")  // Base path for user APIs
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping("/register")
-    public User registerUser(@RequestBody User user) {
-
-        return userService.registerUser(user);
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/{email}")
-    public Optional<User> getUser(@PathVariable String email) {
-        return userService.getUserByEmail(email);
+    @PostMapping("/post")
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        System.out.println("hello");
+        User createdUser = userService.createUser(user);
+        return ResponseEntity.ok(createdUser);
+    }
+
+    @GetMapping("/get/{id}")  // ✅ Corrected: Now the path includes {id}
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        System.out.println("User found: " + user);
+
+        return ResponseEntity.ok(user);
+    }
+
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        System.out.println("hello");
+        return ResponseEntity.ok(users);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        User updatedUser = userService.updateUser(id, user);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok("User deleted successfully");
     }
 }
